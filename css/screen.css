@@ -12,7 +12,7 @@ body {
 }
 
 .racket {
-	z-index: 1;
+	z-index: 2;
 	position: absolute;
 	left: calc(60vw + 70px);
 	top: calc(50vh + 30px);
@@ -39,8 +39,19 @@ body {
 	transition: none;
 }
 
-.ball {
+.racketglow {
+	width: 80px;
+	height: 30px;
+	position: absolute;
 	z-index: 0;
+	background: radial-gradient(at center, rgba(255,255,255,0.5), transparent 60%);
+	left: calc(60vw + 70px);
+	top: calc(50vh + 200px);
+	transition: 0.3s ease;
+}
+
+.ball {
+	z-index: 1;
 	background-image: url("./../images/tennisball.png");
 	background-size: 100%;
 	display: block;
@@ -61,7 +72,7 @@ body {
 	transform: translate(-45px, -45px);
 	border-radius: 45px;
 	position: absolute;
-	z-index: 2;
+	z-index: 99;
 }
 
 .lobaway {

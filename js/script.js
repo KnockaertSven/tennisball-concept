@@ -20,6 +20,7 @@
 
     racket.addEventListener("click", (event) => {
       followMouse = !followMouse;
+      document.querySelector(".racketglow").style.opacity = 0;
       racket.classList.toggle('racket-selected', followMouse);
 
       if (followMouse) {
