@@ -14,8 +14,8 @@ body {
 .racket {
 	z-index: 1;
 	position: absolute;
-	top: 130px;
-	left: 170px;
+	left: calc(60vw + 70px);
+	top: calc(50vh + 30px);
 	display: block;
 	background-image: url("./../images/racket.png");
 	background-size: 100%;
@@ -47,11 +47,12 @@ body {
 	width: 40px;
 	height: 40px;
 	position: absolute;
-	left: 100px;
-	top: 100px;
+	left: 60vw;
+	top: 50vh;
 }
 
 .debug {
+	visibility: hidden;
 	pointer-events: none;
 	display: block;
 	background: rgba(0,2550,0,0.5);

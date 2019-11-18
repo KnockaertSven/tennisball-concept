@@ -21,8 +21,11 @@
     racket.addEventListener("click", (event) => {
       followMouse = !followMouse;
       racket.classList.toggle('racket-selected', followMouse);
-      dist.x = racket.offsetLeft - event.clientX;
-      dist.y = racket.offsetTop - event.clientY;
+
+      if (followMouse) {
+        dist.x = racket.offsetLeft - event.clientX;
+        dist.y = racket.offsetTop - event.clientY;
+      }
     });
 
     document.addEventListener("mousemove", (event) => {
@@ -32,9 +35,19 @@
       racket.style.top = (event.clientY + dist.y).toString() + "px";
       if (debugEnabled) updateDebugPosition(racket, debugOverlay);
 
-      let ballLaunched = tennisballRacketColliding(tennisball, racket);
-      if (ballLaunched) {
-
+      let check = tennisballRacketColliding(tennisball, racket);
+      if (check.colliding) {
+        followMouse = !followMouse;
+        racket.classList.toggle('racket-selected', followMouse);
+        let collisionAngle = angleOf(check.ballPos, check.racketPos);
+        let headingVector = {
+          x: Math.cos(collisionAngle),
+          y: Math.sin(collisionAngle),
+        };
+        $('.ball').animate({
+          left: tennisball.offsetLeft - (1000 *  headingVector.x),
+          top: tennisball.offsetTop - (1000 * headingVector.y),
+        }, 400);
       }
       // TODO:
       // 1. if ball launched, set a variable to false so it cant be hit again
@@ -50,10 +63,9 @@
     // NOTE: Remember that most math has the Y axis as positive above the X.
     // However, for screens we have Y as positive below. For this reason, 
     // the Y values are inverted to get the expected results.
-    let deltaY = (p1.y - p2.y);
+    let deltaY = (p2.y - p1.y);
     let deltaX = (p2.x - p1.x);
-    let result = Math.toDegrees(Math.atan2(deltaY, deltaX));
-    // return (result < 0) ? (360d + result) : result;
+    return Math.atan2(deltaY, deltaX);
   }
 
   function tennisballRacketColliding(ball, racket) {
@@ -69,9 +81,18 @@
     let dx = ballPos.x - racketPos.x;
     let dy = ballPos.y - racketPos.y;
     let distance = Math.sqrt(dx * dx + dy * dy);
-    return (distance < (BALL_SIZE / 2 + RACKET_SIZE / 2));
+
+    return {
+      colliding: (distance < (BALL_SIZE / 2 + RACKET_SIZE / 2)),
+      racketPos: racketPos,
+      ballPos: ballPos,
+    };
   }
 
+  // 
+  // 
+  // 
+  // 
   function tennisballElementColliding(tennisball, element) {
     let circle = {
       x: tennisball.offsetLeft,
