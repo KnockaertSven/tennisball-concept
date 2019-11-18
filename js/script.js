@@ -5,6 +5,14 @@
   let BALL_SIZE = 40; // diameter
   let debugEnabled = false;
 
+  // TODO:
+  // 1. if ball launched, set a variable to false so it cant be hit again
+  // 2. launch it effectively, by calculating angle of hit
+  // 3. check for collisions with words
+  // 4. just play the animation on those words
+  // 5. ??
+  // 6. profit
+
   function init() {
     document.addEventListener("DOMContentLoaded", () => {
       playBallGame();
@@ -46,24 +54,39 @@
           y: Math.sin(collisionAngle),
         };
         $('.ball').animate({
-          left: tennisball.offsetLeft - (1000 *  headingVector.x),
+          left: tennisball.offsetLeft - (1000 * headingVector.x),
           top: tennisball.offsetTop - (1000 * headingVector.y),
         }, 400);
+
+        let elements = document.querySelectorAll(".shoot-me");
+        let interval = setInterval(() => {
+          elements.forEach((element) => {
+            let boundingRect = element.getBoundingClientRect();
+            // this can be optimized since it doesnt change. get it out of the loop
+            let el = {
+              x: element.offsetLeft,
+              y: element.offsetTop,
+              w: boundingRect.width,
+              h: boundingRect.height,
+            };
+            let b = {
+              x: tennisball.offsetLeft + BALL_SIZE / 2,
+              y: tennisball.offsetTop + BALL_SIZE / 2,
+              r: BALL_SIZE / 2,
+            };
+            let collid = tennisballElementColliding(b, el);
+            if (collid){
+              element.classList.toggle("lobaway", true);
+            }
+          });
+        }, 1000 / 30);
+
+        setTimeout(() => clearInterval(interval), 400);
       }
-      // TODO:
-      // 1. if ball launched, set a variable to false so it cant be hit again
-      // 2. launch it effectively, by calculating angle of hit
-      // 3. check for collisions with words
-      // 4. just play the animation on those words
-      // 5. ??
-      // 6. profit
     });
   }
 
   function angleOf(p1, p2) {
-    // NOTE: Remember that most math has the Y axis as positive above the X.
-    // However, for screens we have Y as positive below. For this reason, 
-    // the Y values are inverted to get the expected results.
     let deltaY = (p2.y - p1.y);
     let deltaX = (p2.x - p1.x);
     return Math.atan2(deltaY, deltaX);
@@ -90,37 +113,21 @@
     };
   }
 
-  // 
-  // 
-  // 
-  // 
-  function tennisballElementColliding(tennisball, element) {
-    let circle = {
-      x: tennisball.offsetLeft,
-      y: tennisball.offsetTop,
-    };
-    let rect = {
-      x: element.offsetLeft,
-      y: element.offsetTop,
-    };
-    return rectCircleColliding(circle, rect);
-  }
-
   // MarkE is my hero
   // https://stackoverflow.com/a/21096179/4576996
-  function rectCircleColliding(circle, rect) {
-    var distX = Math.abs(circle.x - rect.x - rect.w / 2);
-    var distY = Math.abs(circle.y - rect.y - rect.h / 2);
+  function tennisballElementColliding(ball, rect) {
+    var distX = Math.abs(ball.x - rect.x - rect.w / 2);
+    var distY = Math.abs(ball.y - rect.y - rect.h / 2);
 
-    if (distX > (rect.w / 2 + circle.r)) { return false; }
-    if (distY > (rect.h / 2 + circle.r)) { return false; }
+    if (distX > (rect.w / 2 + ball.r)) { return false; }
+    if (distY > (rect.h / 2 + ball.r)) { return false; }
 
     if (distX <= (rect.w / 2)) { return true; }
     if (distY <= (rect.h / 2)) { return true; }
 
     var dx = distX - rect.w / 2;
     var dy = distY - rect.h / 2;
-    return (dx * dx + dy * dy <= (circle.r * circle.r));
+    return (dx * dx + dy * dy <= (ball.r * ball.r));
   }
 
   function updateDebugPosition(racket, debugOverlay) {
