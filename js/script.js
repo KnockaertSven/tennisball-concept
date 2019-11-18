@@ -1,5 +1,7 @@
 (() => {
 
+  let OFFSET_RACKET_CENTER = {x: 65, y: 40};
+
   function init() {
     document.addEventListener("DOMContentLoaded", () => {
       playBallGame();
@@ -8,7 +10,8 @@
 
   function playBallGame() {
     let racket = document.querySelector(".racket");
-    let tennisball = document.querySelector(".tennisball");
+    let tennisball = document.querySelector(".ball");
+    let debugOverlay = document.querySelector(".debug");
     let followMouse = false;
     let dist = { x: 0, y: 0 };
 
@@ -23,10 +26,29 @@
       if (!followMouse) return;
       racket.style.left = (event.clientX + dist.x).toString() + "px";
       racket.style.top = (event.clientY + dist.y).toString() + "px";
+      debugOverlay.style.left = (racket.offsetLeft + OFFSET_RACKET_CENTER.x).toString() + "px";
+      debugOverlay.style.top = (racket.offsetTop + OFFSET_RACKET_CENTER.y).toString() + "px";
+      let ballLaunched = tennisballRacketColliding(tennisball, racket);
+      console.log(ballLaunched);
     });
   }
 
-  function tennisballRacketColliding(tennisball, racket) {
+  function tennisballRacketColliding(ball, racket) {
+    let BALL_SIZE = 40;
+    let RACKET_SIZE = 90;
+    let ballPos = {
+      x: ball.offsetLeft + BALL_SIZE / 2,
+      y: ball.offsetTop + BALL_SIZE / 2,
+    };
+    let racketPos = {
+      x: racket.offsetLeft + OFFSET_RACKET_CENTER.x,
+      y: racket.offsetTop + OFFSET_RACKET_CENTER.y,
+    };
+
+    let dx = ballPos.x - racketPos.x;
+    let dy = ballPos.y - racketPos.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+    return (distance < (BALL_SIZE / 2 + RACKET_SIZE/2));
   }
 
   function tennisballElementColliding(tennisball, element) {
@@ -39,14 +61,6 @@
       y: element.offsetTop,
     };
     return rectCircleColliding(circle, rect);
-  }
-
-  function circleCircleColliding(a, b){
-    let dx = a.position.x - b.position.x;
-		let dy = a.position.y - b.position.y;
-		let distance = Math.sqrt(dx * dx + dy * dy);
-
-		return(distance < (a.radius + b.radius));
   }
 
   // MarkE is my hero
